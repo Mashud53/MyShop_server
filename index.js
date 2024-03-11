@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 // middleware
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://myshop-195e1.web.app'],
   credentials: true,
   optionSuccessStatus: 200,
 }
@@ -56,6 +56,7 @@ async function run() {
 
     const productsCollection = client.db("myShop").collection("products");
     const usersCollection = client.db("myShop").collection("users");
+    const ordersCollection = client.db("myShop").collection("orders");
 
     // auth related api
     app.post('/jwt', async (req, res) => {
@@ -80,7 +81,7 @@ async function run() {
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         })
           .send({ success: true })
-          console.log('logout successful')
+        console.log('logout successful')
       } catch (err) {
         res.status(500).send(err)
       }
@@ -98,15 +99,15 @@ async function run() {
       const result = await usersCollection.updateOne(query, {
         $set: { ...user, timestamp: Date.now() },
       },
-      options
+        options
       )
       res.send(result)
     })
 
     // get user role
-    app.get('/user/:email', async (req, res)=>{
-      const email= req.params.email
-      const query= {email:email}
+    app.get('/user/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email: email }
       const result = await usersCollection.findOne(query)
       res.send(result)
     })
@@ -118,14 +119,22 @@ async function run() {
     })
     app.get('/product/:id', async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id)};
-      const filter = {_id:id};
-      const result = await productsCollection.findOne(filter)
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query)
       res.send(result)
     })
-    app.post('/product', async(req, res)=>{
+    app.post('/product', async (req, res) => {
       const product = req.body
-      const result =await productsCollection.insertOne(product);
+      const result = await productsCollection.insertOne(product);
+      res.send(result)
+    })
+
+    // save order in order collection 
+    app.post('/orders', async (req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
+      // send email ......
+
       res.send(result)
     })
 
