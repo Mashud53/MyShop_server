@@ -57,6 +57,7 @@ async function run() {
     const productsCollection = client.db("myShop").collection("products");
     const usersCollection = client.db("myShop").collection("users");
     const ordersCollection = client.db("myShop").collection("orders");
+    const cartsCollection = client.db("myShop").collection("carts");
 
     // auth related api
     app.post('/jwt', async (req, res) => {
@@ -111,10 +112,35 @@ async function run() {
       const result = await usersCollection.findOne(query)
       res.send(result)
     })
+// get all user 
+    app.get('/users', async(req, res)=>{
+      const result = await usersCollection.find().toArray()
+      res.send(result)
+    })
+    app.patch('/users/:id', async(req, res)=>{
+      const id = req.params.id;
+      const role = req.body.role;
+      const filter = {_id: new ObjectId(id)}
+      const updateDoc ={
+        $set:{
+          role:role
+        }
+      }
+      const result = await usersCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
+
+    app.delete('/user/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await usersCollection.deleteOne(query);
+      res.send(result)
+    })
 
     // Product
     app.get('/product', async (req, res) => {
       const result = await productsCollection.find().toArray();
+      
       res.send(result);
     })
     app.get('/product/:id', async (req, res) => {
@@ -126,6 +152,34 @@ async function run() {
     app.post('/product', async (req, res) => {
       const product = req.body
       const result = await productsCollection.insertOne(product);
+      res.send(result)
+    })
+
+    /**
+     * --------------
+     * carts collection
+     * --------------
+     */
+    app.get('/carts', async(req, res)=>{
+      const email= req.query.email;
+      console.log("email====>", email)
+      const filter = {userEmail : email};
+      result = await cartsCollection.find(filter).toArray()
+      res.send(result)
+    })
+
+    app.post('/carts', async(req, res)=>{
+      const cartItems = req.body;
+      console.log(cartItems)
+      const result = await cartsCollection.insertOne(cartItems);
+      res.send(result);
+
+    })
+
+    app.delete('/carts/:id', async(req, res)=>{
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result =await cartsCollection.deleteOne(query)
       res.send(result)
     })
 
