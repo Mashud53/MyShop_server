@@ -112,27 +112,28 @@ async function run() {
       const result = await usersCollection.findOne(query)
       res.send(result)
     })
-// get all user 
-    app.get('/users', async(req, res)=>{
+    // get all user 
+    app.get('/users', async (req, res) => {
       const result = await usersCollection.find().toArray()
       res.send(result)
     })
-    app.patch('/users/:id', async(req, res)=>{
+    // Change user role 
+    app.patch('/users/:id', async (req, res) => {
       const id = req.params.id;
       const role = req.body.role;
-      const filter = {_id: new ObjectId(id)}
-      const updateDoc ={
-        $set:{
-          role:role
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          role: role
         }
       }
       const result = await usersCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
 
-    app.delete('/user/:id', async(req, res)=>{
+    app.delete('/user/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await usersCollection.deleteOne(query);
       res.send(result)
     })
@@ -140,13 +141,22 @@ async function run() {
     // Product
     app.get('/product', async (req, res) => {
       const result = await productsCollection.find().toArray();
-      
+
       res.send(result);
     })
     app.get('/product/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productsCollection.findOne(query)
+      res.send(result)
+    })
+    app.get('/products/:name', async (req, res) => {
+      const name = req.params.name;
+
+      console.log("name is ======", name)
+      const query = { brand: name }
+      const result =await productsCollection.find(query).toArray();
+      // console.log("Apple pRODUCT ====",result)
       res.send(result)
     })
     app.post('/product', async (req, res) => {
@@ -160,15 +170,15 @@ async function run() {
      * carts collection
      * --------------
      */
-    app.get('/carts', async(req, res)=>{
-      const email= req.query.email;
+    app.get('/carts', async (req, res) => {
+      const email = req.query.email;
       console.log("email====>", email)
-      const filter = {userEmail : email};
+      const filter = { userEmail: email };
       result = await cartsCollection.find(filter).toArray()
       res.send(result)
     })
 
-    app.post('/carts', async(req, res)=>{
+    app.post('/carts', async (req, res) => {
       const cartItems = req.body;
       console.log(cartItems)
       const result = await cartsCollection.insertOne(cartItems);
@@ -176,19 +186,42 @@ async function run() {
 
     })
 
-    app.delete('/carts/:id', async(req, res)=>{
+    app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id
-      const query = {_id: new ObjectId(id)}
-      const result =await cartsCollection.deleteOne(query)
+      const query = { _id: new ObjectId(id) }
+      const result = await cartsCollection.deleteOne(query)
       res.send(result)
     })
 
+    // ---------------------
+    // ordr collection 
+    // ----------------------
     // save order in order collection 
     app.post('/orders', async (req, res) => {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
       // send email ......
 
+      res.send(result)
+    })
+    app.get('/orders', async (req, res) => {
+
+      const result = await ordersCollection.find().toArray();
+      // send email ......
+
+      res.send(result)
+    })
+
+    app.patch('/order/:id', async (req, res) => {
+      const id = req.params.id;
+      const status = req.body.status;
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          status: status
+        }
+      }
+      const result = await ordersCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
 
