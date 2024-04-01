@@ -150,6 +150,12 @@ async function run() {
       const result = await productsCollection.findOne(query)
       res.send(result)
     })
+    app.get('/updateproduct/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query)
+      res.send(result)
+    })
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
 
