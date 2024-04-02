@@ -150,18 +150,89 @@ async function run() {
       const result = await productsCollection.findOne(query)
       res.send(result)
     })
-    app.get('/updateproduct/:id', async (req, res) => {
+    // Product update---------------------- 
+    app.patch('/product/:id', async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await productsCollection.findOne(query)
+      const query = { _id: new ObjectId(id) }
+      const productData = req.body;
+      const updateDoc = {
+        $set: {
+          name: productData.name,
+          brand: productData.brand,
+          category: productData.category,
+          type: productData.type,
+          price1: productData.price1,
+          price2: productData.price2,
+          price3: productData.price3,
+          storage1: productData.storage1,
+          storage2: productData.storage2,
+          storage3: productData.storage3,
+          color1: productData.color1,
+          color2: productData.color2,
+          color3: productData.color3,
+          color4: productData.color4,
+          color5: productData.color5,
+          color6: productData.color6,
+          operatingSystem: productData.operatingSystem,
+          network: productData.network,
+          wirelessNetwork: productData.wirelessNetwork,
+          screen: productData.screen,
+          screenSize: productData.screenSize,
+          connector: productData.connector,
+          desc: productData.desc,
+          desc1: productData.desc1,
+          desc2: productData.desc2,
+          desc3: productData.desc3,
+          desc4: productData.desc4,
+          desc5: productData.desc5,
+          productType: productData.productType,
+          imageURL1: productData.imageURL1,
+          imageURL2: productData.imageURL2,
+          imageURL3: productData.imageURL3,
+          imageURL4: productData.imageURL4,
+          imageURL5: productData.imageURL5
+        }
+      }
+      const result = await productsCollection.updateOne(query, updateDoc)
       res.send(result)
+    })
+
+    // product views updata --------------------------------
+    app.patch('/updateViews/:id', async (req, res) => {
+      const id = req.params.id;
+      const currentView = req.body;
+      const query = { _id: new ObjectId(id) }
+      const filter = await productsCollection.findOne(query)
+      console.log(filter.price1)
+      if (filter.views) {
+        const updateDoc = {
+          $set: {
+            views: parseFloat(filter.views) + currentView.views
+          }
+        }
+        
+        const result = await productsCollection.updateOne(query, updateDoc)
+        res.send(result)
+      } else {
+        const updateDoc = {
+          $set: {
+            views: currentView.views
+          }
+        }
+        const options = { upsert: true }
+        const result = await productsCollection.updateOne(query, updateDoc, options)
+        res.send(result)
+      }
+      // const options = { upsert: true }
+      // const result= await productsCollection.insertOne(query, updateDoc, options)
+      // res.send( result)
     })
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
 
       console.log("name is ======", name)
       const query = { brand: name }
-      const result =await productsCollection.find(query).toArray();
+      const result = await productsCollection.find(query).toArray();
       // console.log("Apple pRODUCT ====",result)
       res.send(result)
     })
