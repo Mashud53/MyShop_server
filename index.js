@@ -203,7 +203,25 @@ async function run() {
       res.send(result)
     })
 
-    // product views updata --------------------------------
+    // popular product 
+    app.get('/popularProduct', async(req, res)=>{
+      const result = await productsCollection.find().sort({ 'views': -1 }).toArray()
+      res.send(result)
+    })
+
+    // featured product
+    app.get('/featuredProduct', async(req, res)=>{
+      const query = {product: 'featured'}
+      const result = await productsCollection.find(query).toArray()
+      res.send(result)
+    })
+    // trands product
+    app.get('/trand', async(req, res)=>{
+      const result = await productsCollection.find().sort({ 'totalSales': -1 }).toArray()
+      res.send(result)
+    })
+
+    // product views update --------------------------------
     app.patch('/updateViews/:id', async (req, res) => {
       const id = req.params.id;
       const currentView = req.body;
@@ -229,10 +247,38 @@ async function run() {
         const result = await productsCollection.updateOne(query, updateDoc, options)
         res.send(result)
       }
-      // const options = { upsert: true }
-      // const result= await productsCollection.insertOne(query, updateDoc, options)
-      // res.send( result)
+      
     })
+
+    // Total Sales update .....................
+    app.patch('/updateSales/:id', async (req, res) => {
+      const id = req.params.id;
+      const currentSales = req.body;
+      const query = { _id: new ObjectId(id) }
+      const filter = await productsCollection.findOne(query)
+      console.log('update sales =====',currentSales)
+      if (filter.totalSales) {
+        const updateDoc = {
+          $set: {
+            totalSales: parseFloat(filter.totalSales) + currentSales.sales
+          }
+        }
+        
+        const result = await productsCollection.updateOne(query, updateDoc)
+        res.send(result)
+      } else {
+        const updateDoc = {
+          $set: {
+           totalSales : currentSales.sales
+          }
+        }
+        const options = { upsert: true }
+        const result = await productsCollection.updateOne(query, updateDoc, options)
+        res.send(result)
+      }
+      
+    })
+
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
 
