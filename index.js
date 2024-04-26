@@ -321,6 +321,11 @@ async function run() {
       const result = await productsCollection.find().sort({ 'totalSales': -1 }).toArray()
       res.send(result)
     })
+    // discountProducts product
+    app.get('/discountProduct', async(req, res)=>{      
+      const result = await productsCollection.find({currentPrice1:{$gt:0} }).toArray()
+      res.send(result)
+    })
 
     // product views update --------------------------------
     app.patch('/updateViews/:id', async (req, res) => {
