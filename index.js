@@ -421,6 +421,55 @@ async function run() {
 
     })
 
+    app.patch('/qtyPlus/:id', async (req, res) => {
+      const id = req.params.id
+      const qtyPlus= req.body;
+      const query = { _id: new ObjectId(id) }
+      const filter = await cartsCollection.findOne(query)
+      console.log('update Quentity =====', qtyPlus)
+      console.log('update Id =====', id)
+      if (filter.quantity) {
+        const updateDoc = {
+          $set: {
+            quantity: parseFloat(filter.quantity) + qtyPlus.quantity
+          }
+        }
+        
+        const result = await cartsCollection.updateOne(query, updateDoc)
+        res.send(result)
+      } else {
+        const updateDoc = {
+          $set: {
+           quantity: qtyPlus.quantity + 1
+          }
+        }
+        const options = { upsert: true }
+        const result = await cartsCollection.updateOne(query, updateDoc, options)
+        res.send(result)
+      }
+      
+      
+    
+    })
+
+    app.patch('/qtyMinus/:id', async (req, res)=>{
+      const id= req.params.id;
+      const qtyMinus = req.body;
+      const query = {_id: new ObjectId(id)}
+      const filter = await cartsCollection.findOne(query)
+      console.log('update minus==========', qtyMinus)
+      console.log('update id==========', id)
+      if(filter.quantity && filter.quantity >0){
+        const updateDoc = {
+          $set:{
+            quantity: parseFloat(filter.quantity)- qtyMinus.quantity
+          }
+          
+        }
+        const result = await cartsCollection.updateOne(query, updateDoc)
+        res.send(result)
+      }
+    })
     app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
