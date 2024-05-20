@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId, Collection } = require('mongodb');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
@@ -58,6 +58,7 @@ async function run() {
     const usersCollection = client.db("myShop").collection("users");
     const ordersCollection = client.db("myShop").collection("orders");
     const cartsCollection = client.db("myShop").collection("carts");
+    const reviewsCollection = client.db("myShop").collection("reviews");
 
     // auth related api
     app.post('/jwt', async (req, res) => {
@@ -400,6 +401,17 @@ async function run() {
       res.send(result)
     })
 
+    // ----------------------------------
+    // Riview Collection 
+    // ----------------------------------
+
+    app.post('/review', async(req, res)=>{
+      const reviewInfo = req.body
+      console.log('review info =========',reviewInfo)
+      const result = await reviewsCollection.insertOne(reviewInfo)
+      res.send(result)
+    })
+
     /**
      * --------------
      * carts collection
@@ -459,7 +471,7 @@ async function run() {
       const filter = await cartsCollection.findOne(query)
       console.log('update minus==========', qtyMinus)
       console.log('update id==========', id)
-      if(filter.quantity && filter.quantity >0){
+      if(filter.quantity && parseFloat(filter.quantity) > 1){
         const updateDoc = {
           $set:{
             quantity: parseFloat(filter.quantity)- qtyMinus.quantity
@@ -470,6 +482,7 @@ async function run() {
         res.send(result)
       }
     })
+
     app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
@@ -491,6 +504,17 @@ async function run() {
     app.get('/orders', async (req, res) => {
 
       const result = await ordersCollection.find().toArray();
+      // send email ......
+
+      res.send(result)
+    })
+
+    // user page order 
+    app.get('/myorders', async (req, res) => {
+      const email = req.query.email;
+      console.log("email====>", email)
+      const filter = { email: email };
+      const result = await ordersCollection.find(filter).toArray();
       // send email ......
 
       res.send(result)
