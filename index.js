@@ -83,7 +83,7 @@ async function run() {
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         })
           .send({ success: true })
-        console.log('logout successful')
+        // console.log('logout successful')
       } catch (err) {
         res.status(500).send(err)
       }
@@ -334,7 +334,7 @@ async function run() {
       const currentView = req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await productsCollection.findOne(query)
-      console.log(filter.price1)
+      
       if (filter.views) {
         const updateDoc = {
           $set: {
@@ -363,7 +363,7 @@ async function run() {
       const currentSales = req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await productsCollection.findOne(query)
-      console.log('update sales =====',currentSales)
+      
       if (filter.totalSales) {
         const updateDoc = {
           $set: {
@@ -389,10 +389,10 @@ async function run() {
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
 
-      console.log("name is ======", name)
+      
       const query = { brand: name }
       const result = await productsCollection.find(query).toArray();
-      // console.log("Apple pRODUCT ====",result)
+      
       res.send(result)
     })
     app.post('/product', async (req, res) => {
@@ -402,14 +402,24 @@ async function run() {
     })
 
     // ----------------------------------
-    // Riview Collection 
+    // Review Collection 
     // ----------------------------------
 
     app.post('/review', async(req, res)=>{
       const reviewInfo = req.body
-      console.log('review info =========',reviewInfo)
+      
       const result = await reviewsCollection.insertOne(reviewInfo)
       res.send(result)
+    })
+
+    app.get('/review/:id', async(req,res)=>{
+      const id = req.params.id
+      console.log('review id ========',id)
+      const query = {productId: id}
+      const result =await reviewsCollection.find(query).toArray()
+      
+      res.send(result)
+
     })
 
     /**
@@ -419,7 +429,7 @@ async function run() {
      */
     app.get('/carts', async (req, res) => {
       const email = req.query.email;
-      console.log("email====>", email)
+      
       const filter = { userEmail: email };
       result = await cartsCollection.find(filter).toArray()
       res.send(result)
@@ -427,7 +437,7 @@ async function run() {
 
     app.post('/carts', async (req, res) => {
       const cartItems = req.body;
-      console.log(cartItems)
+      
       const result = await cartsCollection.insertOne(cartItems);
       res.send(result);
 
@@ -438,8 +448,7 @@ async function run() {
       const qtyPlus= req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await cartsCollection.findOne(query)
-      console.log('update Quentity =====', qtyPlus)
-      console.log('update Id =====', id)
+      
       if (filter.quantity) {
         const updateDoc = {
           $set: {
@@ -469,8 +478,7 @@ async function run() {
       const qtyMinus = req.body;
       const query = {_id: new ObjectId(id)}
       const filter = await cartsCollection.findOne(query)
-      console.log('update minus==========', qtyMinus)
-      console.log('update id==========', id)
+      
       if(filter.quantity && parseFloat(filter.quantity) > 1){
         const updateDoc = {
           $set:{
@@ -512,7 +520,7 @@ async function run() {
     // user page order 
     app.get('/myorders', async (req, res) => {
       const email = req.query.email;
-      console.log("email====>", email)
+      
       const filter = { email: email };
       const result = await ordersCollection.find(filter).toArray();
       // send email ......
