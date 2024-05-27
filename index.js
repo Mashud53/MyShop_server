@@ -509,6 +509,26 @@ async function run() {
 
       res.send(result)
     })
+
+    app.post('/cartOrders', async (req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
+      console.log('order item ----', order)
+     
+      const query={_id: {
+        $in: order.cartId.map(id =>new ObjectId (id))
+      }}
+      
+
+      // update product sell 
+      
+
+      // delete cart Item 
+      const deleteResult = await cartsCollection.deleteMany(query);
+      // send email ......
+
+      res.send(result)
+    })
     app.get('/orders', async (req, res) => {
 
       const result = await ordersCollection.find().toArray();
