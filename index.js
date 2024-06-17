@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 // middleware
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://myshop-195e1.web.app'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://deluxmart.com', 'http://api.deluxmart.com', 'https://api.deluxmart.com', 'www.deluxmart.com', 'http://deluxmart.com'],
   credentials: true,
   optionSuccessStatus: 200,
 }
@@ -78,7 +78,7 @@ async function run() {
     app.get('/logout', async (req, res) => {
       try {
         res.clearCookie('token', {
-          maxAge: 0,
+          maxAge: 0,          
           secure: process.env.NODE_ENV === 'producton',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         })
@@ -152,7 +152,7 @@ async function run() {
       res.send(result)
     })
     app.delete('/product/:id', async (req, res) => {
-      const id = req.params.id;      
+      const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productsCollection.deleteOne(query)
       res.send(result)
@@ -163,100 +163,10 @@ async function run() {
       const productData = req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await productsCollection.findOne(query)
-      const previouseDiscount =[filter.currentPrice1, filter.currentPrice2, filter.currentPrice3]
+      const previouseDiscount = [filter.currentPrice1, filter.currentPrice2, filter.currentPrice3]
       const updateDiscount = [productData.currentPrice1, productData.currentPrice2, productData.currentPrice3]
-      
-      if(previouseDiscount && updateDiscount){
-        const updateDoc = {
-            $set: {
-              name: productData.name,
-              brand: productData.brand,
-              category: productData.category,
-              type: productData.type,
-              price1: productData.price1,
-              price2: productData.price2,
-              currentPrice1: productData.currentPrice1,
-              currentPrice2: productData.currentPrice2,
-              currentPrice3: productData.currentPrice3,
-              price3: productData.price3,
-              storage1: productData.storage1,
-              storage2: productData.storage2,
-              storage3: productData.storage3,
-              color1: productData.color1,
-              color2: productData.color2,
-              color3: productData.color3,
-              color4: productData.color4,
-              color5: productData.color5,
-              color6: productData.color6,
-              operatingSystem: productData.operatingSystem,
-              network: productData.network,
-              wirelessNetwork: productData.wirelessNetwork,
-              screen: productData.screen,
-              screenSize: productData.screenSize,
-              connector: productData.connector,
-              desc: productData.desc,
-              desc1: productData.desc1,
-              desc2: productData.desc2,
-              desc3: productData.desc3,
-              desc4: productData.desc4,
-              desc5: productData.desc5,
-              productType: productData.productType,
-              imageURL1: productData.imageURL1,
-              imageURL2: productData.imageURL2,
-              imageURL3: productData.imageURL3,
-              imageURL4: productData.imageURL4,
-              imageURL5: productData.imageURL5
-            }
-          }
-          const result = await productsCollection.updateOne(query, updateDoc)
-          res.send(result)
 
-      }else if(!previouseDiscount && updateDiscount){
-        const updateDoc = {
-            $set: {
-              name: productData.name,
-              brand: productData.brand,
-              category: productData.category,
-              type: productData.type,
-              price1: productData.price1,
-              price2: productData.price2,
-              currentPrice1: productData.currentPrice1,
-              currentPrice2: productData.currentPrice2,
-              currentPrice3: productData.currentPrice3,
-              price3: productData.price3,
-              storage1: productData.storage1,
-              storage2: productData.storage2,
-              storage3: productData.storage3,
-              color1: productData.color1,
-              color2: productData.color2,
-              color3: productData.color3,
-              color4: productData.color4,
-              color5: productData.color5,
-              color6: productData.color6,
-              operatingSystem: productData.operatingSystem,
-              network: productData.network,
-              wirelessNetwork: productData.wirelessNetwork,
-              screen: productData.screen,
-              screenSize: productData.screenSize,
-              connector: productData.connector,
-              desc: productData.desc,
-              desc1: productData.desc1,
-              desc2: productData.desc2,
-              desc3: productData.desc3,
-              desc4: productData.desc4,
-              desc5: productData.desc5,
-              productType: productData.productType,
-              imageURL1: productData.imageURL1,
-              imageURL2: productData.imageURL2,
-              imageURL3: productData.imageURL3,
-              imageURL4: productData.imageURL4,
-              imageURL5: productData.imageURL5
-            }
-          }
-          const options = { upsert: true }
-          const result = await productsCollection.updateOne(query, updateDoc, options)
-          res.send(result)
-      }else   {
+      if (previouseDiscount && updateDiscount) {
         const updateDoc = {
           $set: {
             name: productData.name,
@@ -300,31 +210,128 @@ async function run() {
         }
         const result = await productsCollection.updateOne(query, updateDoc)
         res.send(result)
-      }  
-      
-      
+
+      } else if (!previouseDiscount && updateDiscount) {
+        const updateDoc = {
+          $set: {
+            name: productData.name,
+            brand: productData.brand,
+            category: productData.category,
+            type: productData.type,
+            price1: productData.price1,
+            price2: productData.price2,
+            currentPrice1: productData.currentPrice1,
+            currentPrice2: productData.currentPrice2,
+            currentPrice3: productData.currentPrice3,
+            price3: productData.price3,
+            storage1: productData.storage1,
+            storage2: productData.storage2,
+            storage3: productData.storage3,
+            color1: productData.color1,
+            color2: productData.color2,
+            color3: productData.color3,
+            color4: productData.color4,
+            color5: productData.color5,
+            color6: productData.color6,
+            operatingSystem: productData.operatingSystem,
+            network: productData.network,
+            wirelessNetwork: productData.wirelessNetwork,
+            screen: productData.screen,
+            screenSize: productData.screenSize,
+            connector: productData.connector,
+            desc: productData.desc,
+            desc1: productData.desc1,
+            desc2: productData.desc2,
+            desc3: productData.desc3,
+            desc4: productData.desc4,
+            desc5: productData.desc5,
+            productType: productData.productType,
+            imageURL1: productData.imageURL1,
+            imageURL2: productData.imageURL2,
+            imageURL3: productData.imageURL3,
+            imageURL4: productData.imageURL4,
+            imageURL5: productData.imageURL5
+          }
+        }
+        const options = { upsert: true }
+        const result = await productsCollection.updateOne(query, updateDoc, options)
+        res.send(result)
+      } else {
+        const updateDoc = {
+          $set: {
+            name: productData.name,
+            brand: productData.brand,
+            category: productData.category,
+            type: productData.type,
+            price1: productData.price1,
+            price2: productData.price2,
+            currentPrice1: productData.currentPrice1,
+            currentPrice2: productData.currentPrice2,
+            currentPrice3: productData.currentPrice3,
+            price3: productData.price3,
+            storage1: productData.storage1,
+            storage2: productData.storage2,
+            storage3: productData.storage3,
+            color1: productData.color1,
+            color2: productData.color2,
+            color3: productData.color3,
+            color4: productData.color4,
+            color5: productData.color5,
+            color6: productData.color6,
+            operatingSystem: productData.operatingSystem,
+            network: productData.network,
+            wirelessNetwork: productData.wirelessNetwork,
+            screen: productData.screen,
+            screenSize: productData.screenSize,
+            connector: productData.connector,
+            desc: productData.desc,
+            desc1: productData.desc1,
+            desc2: productData.desc2,
+            desc3: productData.desc3,
+            desc4: productData.desc4,
+            desc5: productData.desc5,
+            productType: productData.productType,
+            imageURL1: productData.imageURL1,
+            imageURL2: productData.imageURL2,
+            imageURL3: productData.imageURL3,
+            imageURL4: productData.imageURL4,
+            imageURL5: productData.imageURL5
+          }
+        }
+        const result = await productsCollection.updateOne(query, updateDoc)
+        res.send(result)
+      }
+
+
     })
 
     // popular product 
-    app.get('/popularProduct', async(req, res)=>{
+    app.get('/popularProduct', async (req, res) => {
       const result = await productsCollection.find().sort({ 'views': -1 }).toArray()
       res.send(result)
     })
 
     // featured product
-    app.get('/featuredProduct', async(req, res)=>{
-      const query = {product: 'featured'}
+    app.get('/featuredProduct', async (req, res) => {
+      const query = { product: 'featured' }
       const result = await productsCollection.find(query).toArray()
       res.send(result)
     })
     // trands product
-    app.get('/trand', async(req, res)=>{
+    app.get('/trand', async (req, res) => {
       const result = await productsCollection.find().sort({ 'totalSales': -1 }).toArray()
       res.send(result)
     })
     // discountProducts product
-    app.get('/discountProduct', async(req, res)=>{      
-      const result = await productsCollection.find({currentPrice1:{$gt:0} }).toArray()
+    app.get('/discountProduct', async (req, res) => {
+      const result = await productsCollection.find({ currentPrice1: { $gt: 0 } }).toArray()
+      res.send(result)
+    })
+
+    // Used Device 
+    app.get('/usedDevice', async (req, res) => {
+      const query = {productType: 'Used'}
+      const result = await productsCollection.find(query).toArray()
       res.send(result)
     })
 
@@ -334,14 +341,14 @@ async function run() {
       const currentView = req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await productsCollection.findOne(query)
-      
+
       if (filter.views) {
         const updateDoc = {
           $set: {
             views: parseFloat(filter.views) + currentView.views
           }
         }
-        
+
         const result = await productsCollection.updateOne(query, updateDoc)
         res.send(result)
       } else {
@@ -354,7 +361,7 @@ async function run() {
         const result = await productsCollection.updateOne(query, updateDoc, options)
         res.send(result)
       }
-      
+
     })
 
     // Total Sales update .....................
@@ -363,36 +370,36 @@ async function run() {
       const currentSales = req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await productsCollection.findOne(query)
-      
+
       if (filter.totalSales) {
         const updateDoc = {
           $set: {
             totalSales: parseFloat(filter.totalSales) + currentSales.sales
           }
         }
-        
+
         const result = await productsCollection.updateOne(query, updateDoc)
         res.send(result)
       } else {
         const updateDoc = {
           $set: {
-           totalSales : currentSales.sales
+            totalSales: currentSales.sales
           }
         }
         const options = { upsert: true }
         const result = await productsCollection.updateOne(query, updateDoc, options)
         res.send(result)
       }
-      
+
     })
 
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
 
-      
+
       const query = { brand: name }
       const result = await productsCollection.find(query).toArray();
-      
+
       res.send(result)
     })
     app.post('/product', async (req, res) => {
@@ -405,19 +412,19 @@ async function run() {
     // Review Collection 
     // ----------------------------------
 
-    app.post('/review', async(req, res)=>{
+    app.post('/review', async (req, res) => {
       const reviewInfo = req.body
-      
+
       const result = await reviewsCollection.insertOne(reviewInfo)
       res.send(result)
     })
 
-    app.get('/review/:id', async(req,res)=>{
+    app.get('/review/:id', async (req, res) => {
       const id = req.params.id
-      console.log('review id ========',id)
-      const query = {productId: id}
-      const result =await reviewsCollection.find(query).toArray()
-      
+      console.log('review id ========', id)
+      const query = { productId: id }
+      const result = await reviewsCollection.find(query).toArray()
+
       res.send(result)
 
     })
@@ -429,7 +436,7 @@ async function run() {
      */
     app.get('/carts', async (req, res) => {
       const email = req.query.email;
-      
+
       const filter = { userEmail: email };
       result = await cartsCollection.find(filter).toArray()
       res.send(result)
@@ -437,7 +444,7 @@ async function run() {
 
     app.post('/carts', async (req, res) => {
       const cartItems = req.body;
-      
+
       const result = await cartsCollection.insertOne(cartItems);
       res.send(result);
 
@@ -445,46 +452,46 @@ async function run() {
 
     app.patch('/qtyPlus/:id', async (req, res) => {
       const id = req.params.id
-      const qtyPlus= req.body;
+      const qtyPlus = req.body;
       const query = { _id: new ObjectId(id) }
       const filter = await cartsCollection.findOne(query)
-      
+
       if (filter.quantity) {
         const updateDoc = {
           $set: {
             quantity: parseFloat(filter.quantity) + qtyPlus.quantity
           }
         }
-        
+
         const result = await cartsCollection.updateOne(query, updateDoc)
         res.send(result)
       } else {
         const updateDoc = {
           $set: {
-           quantity: qtyPlus.quantity + 1
+            quantity: qtyPlus.quantity + 1
           }
         }
         const options = { upsert: true }
         const result = await cartsCollection.updateOne(query, updateDoc, options)
         res.send(result)
       }
-      
-      
-    
+
+
+
     })
 
-    app.patch('/qtyMinus/:id', async (req, res)=>{
-      const id= req.params.id;
+    app.patch('/qtyMinus/:id', async (req, res) => {
+      const id = req.params.id;
       const qtyMinus = req.body;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const filter = await cartsCollection.findOne(query)
-      
-      if(filter.quantity && parseFloat(filter.quantity) > 1){
+
+      if (filter.quantity && parseFloat(filter.quantity) > 1) {
         const updateDoc = {
-          $set:{
-            quantity: parseFloat(filter.quantity)- qtyMinus.quantity
+          $set: {
+            quantity: parseFloat(filter.quantity) - qtyMinus.quantity
           }
-          
+
         }
         const result = await cartsCollection.updateOne(query, updateDoc)
         res.send(result)
@@ -509,11 +516,11 @@ async function run() {
 
       res.send(result)
     })
-    app.delete ('/orders/:id', async (req, res) => {
+    app.delete('/orders/:id', async (req, res) => {
       const id = req.params.id;
       console.log('delete order====', id)
       const query = { _id: new ObjectId(id) }
-      const result = await ordersCollection.deleteOne(query);    
+      const result = await ordersCollection.deleteOne(query);
 
       res.send(result)
     })
@@ -522,14 +529,16 @@ async function run() {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
       console.log('order item ----', order)
-     
-      const query={_id: {
-        $in: order.cartId.map(id =>new ObjectId (id))
-      }}
-      
+
+      const query = {
+        _id: {
+          $in: order.cartId.map(id => new ObjectId(id))
+        }
+      }
+
 
       // update product sell 
-      
+
 
       // delete cart Item 
       const deleteResult = await cartsCollection.deleteMany(query);
@@ -548,7 +557,7 @@ async function run() {
     // user page order 
     app.get('/myorders', async (req, res) => {
       const email = req.query.email;
-      
+
       const filter = { email: email };
       const result = await ordersCollection.find(filter).toArray();
       // send email ......
