@@ -55,6 +55,8 @@ async function run() {
     await client.connect();
 
     const productsCollection = client.db("myShop").collection("products");
+    const menuCollection = client.db("myShop").collection("menus");
+    const subMenuCollection = client.db("myShop").collection("submenus");
     const usersCollection = client.db("myShop").collection("users");
     const ordersCollection = client.db("myShop").collection("orders");
     const cartsCollection = client.db("myShop").collection("carts");
@@ -78,7 +80,7 @@ async function run() {
     app.get('/logout', async (req, res) => {
       try {
         res.clearCookie('token', {
-          maxAge: 0,          
+          maxAge: 0,
           secure: process.env.NODE_ENV === 'producton',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         })
@@ -139,10 +141,98 @@ async function run() {
       res.send(result)
     })
 
+    // menus 
+    app.get('/menu', async (req, res) => {
+      const result = await menuCollection.find().toArray();
+
+      res.send(result);
+    })
+
+    app.post('/menu', async (req, res) => {
+
+      try {
+        const menuData = req.body;
+        const result = await menuCollection.insertOne(menuData)
+        res.send(result)
+
+      } catch (error) {
+        console.error('Error while adding menu')
+      }
+
+
+    })
+
+    app.delete('/menu/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await menuCollection.deleteOne(query)
+      res.send(result)
+    })
+
+    // submenus 
+    app.get('/submenu', async (req, res) => {
+      const result = await subMenuCollection.find().toArray()
+      res.send(result)
+    })
+
+    app.post('/submenu', async (req, res) => {
+
+      try {
+        const subMenuData = req.body;
+        const result = await subMenuCollection.insertOne(subMenuData)
+        res.send(result)
+
+      } catch (error) {
+        console.error('Error while adding menu')
+      }
+    })
+
+    app.delete('/submenu/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await subMenuCollection.deleteOne(query)
+      res.send(result)
+    })
+
+    app.get('/submenu/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await subMenuCollection.findOne(query)
+      res.send(result)
+    })
+
+    // update submenu 
+    app.patch('/submenu/:id', async (req, res) => {
+      const id = req.params.id;
+      const subMenuData = req.body;
+      const query = { _id: new ObjectId(id) }
+
+      const updateDoc = {
+        $set: {
+          name: subMenuData.name,
+          menu: subMenuData.menu,
+        }
+      }
+      const options = { upsert: true }
+      const result = await subMenuCollection.updateOne(query, updateDoc, options)
+      console.log(result)
+      res.send(result)
+
+    })
+
+
+    app.get('/products/:name', async (req, res) => {
+      const name = req.params.name;
+      const query = { brand: name }
+      const result = await productsCollection.find(query).toArray();
+
+      res.send(result)
+    })
+
+
     // Product
     app.get('/product', async (req, res) => {
       const result = await productsCollection.find().toArray();
-
       res.send(result);
     })
     app.get('/product/:id', async (req, res) => {
@@ -330,7 +420,7 @@ async function run() {
 
     // Used Device 
     app.get('/usedDevice', async (req, res) => {
-      const query = {productType: 'Used'}
+      const query = { productType: 'Used' }
       const result = await productsCollection.find(query).toArray()
       res.send(result)
     })
@@ -395,8 +485,6 @@ async function run() {
 
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
-
-
       const query = { brand: name }
       const result = await productsCollection.find(query).toArray();
 
@@ -421,7 +509,6 @@ async function run() {
 
     app.get('/review/:id', async (req, res) => {
       const id = req.params.id
-      console.log('review id ========', id)
       const query = { productId: id }
       const result = await reviewsCollection.find(query).toArray()
 
