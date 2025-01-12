@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 // middleware
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://deluxmart.com', 'http://api.deluxmart.com', 'https://api.deluxmart.com', 'www.deluxmart.com', 'http://deluxmart.com'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://deluxmart.com', 'http://api.deluxmart.com', 'https://api.deluxmart.com', 'www.deluxmart.com', 'http://deluxmart.com','https://myshop-195e1.web.app'],
   credentials: true,
   optionSuccessStatus: 200,
 }
@@ -56,11 +56,14 @@ async function run() {
 
     const productsCollection = client.db("myShop").collection("products");
     const menuCollection = client.db("myShop").collection("menus");
+    const bannerCollection = client.db("myShop").collection("banner");
     const subMenuCollection = client.db("myShop").collection("submenus");
     const usersCollection = client.db("myShop").collection("users");
     const ordersCollection = client.db("myShop").collection("orders");
     const cartsCollection = client.db("myShop").collection("carts");
     const reviewsCollection = client.db("myShop").collection("reviews");
+    const shopByCategoryCollection = client.db("myShop").collection("shopByCategory");
+
 
     // auth related api
     app.post('/jwt', async (req, res) => {
@@ -141,6 +144,7 @@ async function run() {
       res.send(result)
     })
 
+
     // menus 
     app.get('/menu', async (req, res) => {
       const result = await menuCollection.find().toArray();
@@ -201,26 +205,66 @@ async function run() {
       res.send(result)
     })
 
-    // update submenu 
-    app.patch('/submenu/:id', async (req, res) => {
-      const id = req.params.id;
-      const subMenuData = req.body;
-      const query = { _id: new ObjectId(id) }
-
-      const updateDoc = {
-        $set: {
-          name: subMenuData.name,
-          menu: subMenuData.menu,
+      // update submenu 
+      app.patch('/submenu/:id', async (req, res) => {
+        const id = req.params.id;
+        const subMenuData = req.body;
+        const query = { _id: new ObjectId(id) }
+  
+        const updateDoc = {
+          $set: {
+            name: subMenuData.name,
+            menu: subMenuData.menu,
+          }
         }
-      }
-      const options = { upsert: true }
-      const result = await subMenuCollection.updateOne(query, updateDoc, options)
-      console.log(result)
-      res.send(result)
+        const options = { upsert: true }
+        const result = await subMenuCollection.updateOne(query, updateDoc, options)
+        console.log(result)
+        res.send(result)
+  
+      })
 
+    // Banner ============
+    app.post('/banners', async(req, res)=>{
+      const data= req.body;
+      const result = await bannerCollection.insertOne(data)
+    res.send(result)
     })
 
+    app.get('/banners', async(req, res)=>{
+      const result= await bannerCollection.find().toArray();
+      res.send(result)
+    })
 
+    app.delete('/banners/:id', async (req, res)=>{
+      const id=req.params.id;
+      const query= {_id: new ObjectId(id)}
+      const result = await bannerCollection.deleteOne(query);
+      res.send(result);
+    })
+
+// ======================= 
+    app.post('/shopbycategory', async(req, res)=>{
+      const data= req.body;
+      const result = await shopByCategoryCollection.insertOne(data)
+    res.send(result)
+    })
+
+    app.get('/shopbycategory', async(req, res)=>{
+      const result= await shopByCategoryCollection.find().toArray();
+      res.send(result)
+    })
+
+    app.delete('/shopbycategory/:id', async (req, res)=>{
+      const id=req.params.id;
+      const query= {_id: new ObjectId(id)}
+      const result = await shopByCategoryCollection.deleteOne(query);
+      res.send(result);
+    })
+// ================================ 
+  
+
+ // Product
     app.get('/products/:name', async (req, res) => {
       const name = req.params.name;
       const query = { brand: name }
@@ -229,8 +273,7 @@ async function run() {
       res.send(result)
     })
 
-
-    // Product
+   
     app.get('/product', async (req, res) => {
       const result = await productsCollection.find().toArray();
       res.send(result);
@@ -492,6 +535,7 @@ async function run() {
     })
     app.post('/product', async (req, res) => {
       const product = req.body
+      console.log(product)
       const result = await productsCollection.insertOne(product);
       res.send(result)
     })
